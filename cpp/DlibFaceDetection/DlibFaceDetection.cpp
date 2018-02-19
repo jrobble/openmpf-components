@@ -329,7 +329,7 @@ void DlibFaceDetection::CloseAnyOpenTracks() {
             //track is still going at end index
             //set the stop_frame for this track!!!
             //get last frame location entry
-            int last_used_frame_location_index = current_track.mpf_video_track.frame_locations.rbegin()->first;
+            long last_used_frame_location_index = current_track.mpf_video_track.frame_locations.rbegin()->first;
             current_track.mpf_video_track.stop_frame = last_used_frame_location_index;
 
             //now the track can be saved
@@ -395,7 +395,7 @@ void DlibFaceDetection::DlibRectToMPFImageLocation(const rectangle &object_rect,
 }
 
 void DlibFaceDetection::UpdateTracks(const dlib::cv_image<dlib::uint8> &next_frame_gray, const Mat &next_frame_gray_mat,
-                                     vector<rect_detection> &next_detected_objects, int frame_index) {
+                                     vector<rect_detection> &next_detected_objects, long frame_index) {
 
     //loop through existing tracks locating the most similar newly detected object (from next_detected_objects)
     //remove any newly detected objects that are used
@@ -448,7 +448,7 @@ void DlibFaceDetection::UpdateTracks(const dlib::cv_image<dlib::uint8> &next_fra
         if (update_conf >= min_update_correlation) {
             MPFImageLocation mpf_object_detection;
             DlibRectToMPFImageLocation(current_track->correlation_tracker.get_position(), object_location_conf, mpf_object_detection);
-            current_track->mpf_video_track.frame_locations.insert(pair<int, MPFImageLocation>(frame_index, mpf_object_detection));
+            current_track->mpf_video_track.frame_locations.emplace(frame_index, std::move(mpf_object_detection));
 
             //next track
             ++current_track;
@@ -488,7 +488,7 @@ void DlibFaceDetection::UpdateTracks(const dlib::cv_image<dlib::uint8> &next_fra
 
             MPFImageLocation first_mpf_object_detection;
             DlibRectToMPFImageLocation(detected_object_rect, detected_object->detection_confidence, first_mpf_object_detection);
-            new_dlib_track.mpf_video_track.frame_locations.insert(pair<int, MPFImageLocation>(frame_index, first_mpf_object_detection));
+            new_dlib_track.mpf_video_track.frame_locations.emplace(frame_index, std::move(first_mpf_object_detection));
 
             current_tracks.push_back(new_dlib_track);
 
@@ -504,10 +504,10 @@ MPFDetectionError DlibFaceDetection::GetDetectionsFromVideoCapture(const MPFVide
                                                                    MPFVideoCapture &video_capture,
                                                                    vector<MPFVideoTrack> &tracks) {
 
-    int total_frames = video_capture.GetFrameCount();
+    long total_frames = video_capture.GetFrameCount();
     LOG4CXX_INFO(logger_, "[" << job.job_name << "] Total video frames: " << total_frames);
 
-    int frame_index = 0;
+    long frame_index = 0;
 
     Mat frame, gray;
 
@@ -576,7 +576,7 @@ MPFDetectionError DlibFaceDetection::GetDetectionsFromVideoCapture(const MPFVide
                 LOG4CXX_DEBUG(logger_, "[" << job.job_name << "] Track start index: " << tracks[i].start_frame);
                 LOG4CXX_DEBUG(logger_, "[" << job.job_name << "] Track end index: " << tracks[i].stop_frame);
 
-                for (map<int, MPFImageLocation>::const_iterator it = tracks[i].frame_locations.begin(); it != tracks[i].frame_locations.end(); ++it)
+                for (map<long, MPFImageLocation>::const_iterator it = tracks[i].frame_locations.begin(); it != tracks[i].frame_locations.end(); ++it)
                 {
                     LOG4CXX_DEBUG(logger_, "[" << job.job_name << "] Frame num: " << it->first);
                     LOG4CXX_DEBUG(logger_, "[" << job.job_name << "] Bounding rect: (" << it->second.x_left_upper << ","

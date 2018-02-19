@@ -350,7 +350,7 @@ bool OcvFaceDetection::IsBadFaceRatio(const Rect &face_rect) {
     return false;
 }
 
-void OcvFaceDetection::CloseAnyOpenTracks(int frame_index) {
+void OcvFaceDetection::CloseAnyOpenTracks(long frame_index) {
     if (!current_tracks.empty()) {
         //need to stop all current tracks!
         for (vector<Track>::iterator it = current_tracks.begin(); it != current_tracks.end(); it++) {
@@ -470,7 +470,7 @@ MPFDetectionError OcvFaceDetection::GetDetectionsFromVideoCapture(
     long total_frames = video_capture.GetFrameCount();
     LOG4CXX_DEBUG(OpenFaceDetectionLogger, "[" << job.job_name << "] Total video frames: " << total_frames);
 
-    int frame_index = 0;
+    long frame_index = 0;
 
     if (imshow_on) {
         namedWindow("Open Tracker", 0);
@@ -809,7 +809,7 @@ MPFDetectionError OcvFaceDetection::GetDetectionsFromVideoCapture(
 
                 fd.confidence = static_cast<float>(correct_detected_rect_pair.second);
                 //can finally store the MPFImageLocation
-                track->face_track.frame_locations.insert(pair<int, MPFImageLocation>(frame_index, fd));
+                track->face_track.frame_locations.emplace(frame_index, std::move(fd));
             }
             else {
                 continue;
@@ -924,9 +924,9 @@ MPFDetectionError OcvFaceDetection::GetDetectionsFromVideoCapture(
                     first_face_detection.confidence = first_face_confidence;
 
                     //add the first detection
-                    track_new.face_track.frame_locations.insert(pair<int, MPFImageLocation>(frame_index, first_face_detection));
+                    track_new.face_track.frame_locations.emplace(frame_index, std::move(first_face_detection));
                     //add the new track
-                    current_tracks.push_back(track_new);
+                    current_tracks.push_back(std::move(track_new));
 
                     LOG4CXX_TRACE(OpenFaceDetectionLogger, "[" << job.job_name << "] Creating new track");
                 }
@@ -998,7 +998,7 @@ MPFDetectionError OcvFaceDetection::GetDetectionsFromVideoCapture(
                 LOG4CXX_DEBUG(OpenFaceDetectionLogger, "[" << job.job_name << "] Track start index: " << tracks[i] .start_frame);
                 LOG4CXX_DEBUG(OpenFaceDetectionLogger, "[" << job.job_name << "] Track end index: " << tracks[i] .stop_frame);
 
-                for (map<int, MPFImageLocation>::const_iterator it = tracks[i].frame_locations.begin(); it != tracks[i].frame_locations.end(); ++it)
+                for (auto it = tracks[i].frame_locations.begin(); it != tracks[i].frame_locations.end(); ++it)
                 {
                     LOG4CXX_DEBUG(OpenFaceDetectionLogger, "[" << job.job_name << "] Frame num: " << it->first);
                     LOG4CXX_DEBUG(OpenFaceDetectionLogger, "[" << job.job_name << "] Bounding rect: (" << it->second .x_left_upper << ","

@@ -55,7 +55,7 @@ struct Track {
     int init_point_count;
     int current_point_count;
     float current_point_percent;
-    int last_face_detected_index;
+    long last_face_detected_index;
     bool track_lost;
     std::vector <cv::Point2f> previous_points;
     std::vector <cv::Point2f> current_points;
@@ -114,7 +114,7 @@ private:
     cv::Mat GetMask(const cv::Mat &frame, const cv::Rect &face, bool copy_face_rect = false);
     bool IsBadFaceRatio(const cv::Rect &face);
 
-    void CloseAnyOpenTracks(int frame_index);
+    void CloseAnyOpenTracks(long frame_index);
 
     void AdjustRectToEdges(cv::Rect &rect, const cv::Mat &src);
 

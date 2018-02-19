@@ -129,7 +129,7 @@ private:
     void UpdateTracks(const dlib::cv_image<dlib::uint8> &next_frame_gray,
                       const cv::Mat &next_frame_gray_mat,
                       std::vector<dlib::rect_detection> &next_detected_objects,
-                      int frame_index);
+                      long frame_index);
 
     std::vector<dlib::rect_detection> DetectFacesDlib(const cv::Mat &frame_gray);
 

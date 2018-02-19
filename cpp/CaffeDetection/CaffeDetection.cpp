@@ -120,7 +120,7 @@ bool CaffeDetection::Close() {
 }
 
 
-void addToTrack(MPFImageLocation &location, int frame_index, MPFVideoTrack &track) {
+void addToTrack(MPFImageLocation &location, long frame_index, MPFVideoTrack &track) {
     track.stop_frame = frame_index;
     if (location.confidence > track.confidence) {
         track.confidence = location.confidence;
@@ -130,7 +130,7 @@ void addToTrack(MPFImageLocation &location, int frame_index, MPFVideoTrack &trac
 }
 
 
-void defaultTracker(MPFImageLocation &location, int frame_index, std::vector<MPFVideoTrack> &tracks) {
+void defaultTracker(MPFImageLocation &location, long frame_index, std::vector<MPFVideoTrack> &tracks) {
     bool should_start_new_track = tracks.empty()
                                || tracks.back().detection_properties["CLASSIFICATION"]
                                   != location.detection_properties["CLASSIFICATION"];
@@ -142,7 +142,7 @@ void defaultTracker(MPFImageLocation &location, int frame_index, std::vector<MPF
 }
 
 
-void feedForwardTracker(MPFImageLocation &location, int frameIndex, std::vector<MPFVideoTrack> &tracks) {
+void feedForwardTracker(MPFImageLocation &location, long frameIndex, std::vector<MPFVideoTrack> &tracks) {
     if (tracks.empty()) {
         tracks.emplace_back(frameIndex, frameIndex, location.confidence, location.detection_properties);
     }
@@ -183,7 +183,7 @@ MPF::COMPONENT::MPFDetectionError CaffeDetection::getDetections(const MPF::COMPO
         }
 
         cv::Mat frame;
-        int frame_index = -1;
+        long frame_index = -1;
         while (video_cap.Read(frame)) {
             frame_index++;
             std::unique_ptr<MPFImageLocation> location;

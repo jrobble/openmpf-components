@@ -107,7 +107,7 @@ int main(int argc, char* argv[]) {
                                                           << ", detection vector size is " << tracks[i].frame_locations.size()
                                                           << ", text is "
                                                           << DetectionComponentUtils::GetProperty<std::string>(tracks[i].detection_properties, "TEXT", ""));
-                    for (std::map<int,MPFImageLocation>::iterator it = tracks[i].frame_locations.begin(); it != tracks[i].frame_locations.end(); ++it) {
+                    for (auto it = tracks[i].frame_locations.begin(); it != tracks[i].frame_locations.end(); ++it) {
                         LOG4CXX_DEBUG(logger, it->first << ","
                                                         << it->second.x_left_upper << ","
                                                         << it->second.y_left_upper << ","

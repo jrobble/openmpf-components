@@ -295,8 +295,8 @@ MPFDetectionError LicensePlateTextDetection::GetDetectionsFromVideoCapture(const
                                                                            MPFVideoCapture &video_capture,
                                                                            vector<MPFVideoTrack> &tracks) {
 
-    int frame_num = 0;
-    int frame_count = 0;
+    long frame_num = 0;
+    long frame_count = 0;
     cv::Mat frame;
     multimap <string, MPFVideoTrack> tracks_map;
 
@@ -365,7 +365,7 @@ MPFDetectionError LicensePlateTextDetection::GetDetectionsFromVideoCapture(const
                                     track_rect.area()) * rectangle_intersection_min_)) {
                         // Add detection to this track and update stop_value
                         iter->second.stop_frame = frame_num;
-                        iter->second.frame_locations.insert(pair<int, MPFImageLocation>(frame_num, detection));
+                        iter->second.frame_locations.emplace(frame_num, detection);
                         create_new_track = false;
                     }
                     break;
@@ -376,7 +376,7 @@ MPFDetectionError LicensePlateTextDetection::GetDetectionsFromVideoCapture(const
                 MPFVideoTrack new_track;
                 new_track.start_frame = frame_num;
                 new_track.stop_frame = frame_num;
-                new_track.frame_locations.insert(pair<int, MPFImageLocation>(frame_num, detection));
+                new_track.frame_locations.emplace(frame_num, detection);
                 tracks_map.insert(pair<string, MPFVideoTrack>(
                         key_to_use, new_track));
             }
